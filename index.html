@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TGB Consumer Finance Portal</title>
+<style>
+/* OLD SCHOOL ENTERPRISE STYLING */
+:root {
+    --bg: #d4d0c8; /* Classic Windows gray */
+    --sf: #ffffff;
+    --tx: #000000;
+    --bd: #808080; /* Hard dark gray border */
+    --bl: #004d28; /* TGB Dark Green */
+    --or: #c8871a; /* TGB Gold */
+    --ok: #006600;
+    --er: #cc0000;
+    --hl: #0A246A; /* Highlight blue for selected rows */
+    box-sizing: border-box;
+}
+html { height: 100%; }
+* { box-sizing: border-box; }
+body { 
+    margin: 0; 
+    height: 100%; 
+    font: 12px/1.4 Tahoma, Arial, sans-serif; /* Classic system font */
+    background: var(--bg); 
+    color: var(--tx); 
+}
+
+/* BOOT SCREEN */
+#boot { position: fixed; inset: 0; z-index: 50; background: var(--bl); color: #fff; display: flex; align-items: center; justify-content: center; }
+.bx { width: 400px; background: var(--bg); color: var(--tx); border: 2px outset #fff; padding: 20px; }
+.bx h1 { margin: 0; font-size: 18px; color: var(--bl); font-family: "Times New Roman", Times, serif; }
+.pb { height: 12px; background: #fff; border: 1px inset #808080; margin: 15px 0 5px; }
+.pb i { display: block; height: 100%; width: 0; background: var(--bl); transition: width .4s; }
+
+/* APP LAYOUT */
+#app { display: none; height: 100%; flex-direction: column; }
+
+/* HEADER */
+header { 
+    background: var(--bl); 
+    color: #fff; 
+    padding: 8px 12px; 
+    display: flex; 
+    gap: 12px; 
+    align-items: center; 
+    border-bottom: 4px solid var(--or);
+}
+header .logo { font-family: "Times New Roman", Times, serif; font-size: 18px; font-weight: bold; margin-right: auto; }
+header .logo small { font-family: Tahoma, Arial, sans-serif; font-size: 11px; font-weight: normal; margin-left: 10px; color: var(--or); }
+.role-switcher { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.role-switcher select { font: 11px Tahoma; border: 1px inset #fff; padding: 2px; }
+
+/* BUTTONS - 3D Outset effect */
+button { 
+    font: 12px Tahoma, Arial, sans-serif; 
+    padding: 4px 12px; 
+    border: 2px outset #fff; 
+    background: var(--bg); 
+    color: var(--tx); 
+    cursor: pointer; 
+}
+button:active { border-style: inset; padding: 5px 11px 3px 13px; } /* Heavy physical click feeling */
+button.sec { color: #333; }
+button.dn { color: var(--er); font-weight: bold; }
+
+/* TABS */
+.tabs { display: flex; background: var(--bg); border-bottom: 1px solid var(--bd); padding: 4px 4px 0 4px; }
+.tabs a { 
+    padding: 6px 16px; 
+    cursor: pointer; 
+    color: var(--tx); 
+    border: 1px solid var(--bg); 
+    border-top-left-radius: 4px; 
+    border-top-right-radius: 4px; 
+    margin-right: 2px; 
+}
+.tabs a.on { background: var(--sf); border-color: var(--bd) var(--bd) var(--sf) var(--bd); font-weight: bold; position: relative; top: 1px; }
+
+/* WORK AREA */
+#work { flex: 1; overflow: auto; padding: 16px; background: var(--sf); min-width: 0; }
+h2 { margin: 0 0 12px; font-size: 16px; border-bottom: 1px solid var(--bd); padding-bottom: 4px; color: var(--bl); }
+h5 { margin: 16px 0 6px; font-size: 13px; background: #e0e0e0; padding: 4px; border: 1px solid var(--bd); }
+
+/* FORMS */
+.card { border: 1px solid var(--bd); padding: 12px; margin-bottom: 12px; background: #f9f9f9; }
+.fm { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 6px 12px; max-width: 700px; }
+.fm label { align-self: center; font-weight: normal; }
+.fm input, .fm select { padding: 4px; border: 2px inset #d4d0c8; background: var(--sf); color: var(--tx); font: inherit; min-width: 0; }
+.fm input:focus, .fm select:focus { background: #ffffcc; outline: none; }
+.bt { margin: 12px 0 6px; display: flex; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 1px dashed #ccc; }
+
+/* TABLES - Strict enterprise grid */
+.tw { overflow-x: auto; border: 1px solid var(--bd); margin: 8px 0 16px; }
+table { border-collapse: collapse; width: 100%; background: var(--sf); font-size: 11px; }
+th { background: #e0e0e0; text-align: left; padding: 6px 8px; border: 1px solid var(--bd); color: #000; font-weight: bold; }
+td { padding: 6px 8px; border: 1px solid var(--bd); white-space: nowrap; }
+td.n { text-align: right; font-family: "Courier New", Courier, monospace; font-weight: bold; }
+tr:hover td { background: #f0f0f0; }
+td button, th button { padding: 2px 8px; font-size: 11px; }
+
+/* STATUS CHIPS */
+.ch { font-weight: bold; text-transform: uppercase; }
+.ch.g { color: var(--ok); }
+.ch.a { color: var(--or); }
+.ch.r { color: var(--er); }
+
+/* STEPS WIZARD */
+.stp { display: flex; border: 1px solid var(--bd); margin-bottom: 16px; background: var(--bg); }
+.stp a { flex: 1; padding: 6px 8px; border-right: 1px solid var(--bd); text-align: center; cursor: pointer; color: #666; font-size: 11px; }
+.stp a:last-child { border-right: none; }
+.stp a.d { color: var(--ok); font-weight: bold; }
+.stp a.c { background: var(--bl); color: #fff; font-weight: bold; }
+.stp a.s { background: var(--or); color: #fff; }
+.stp a.l { color: #aaa; cursor: default; }
+
+/* DASHBOARD STATS */
+.fun { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.fun div { background: var(--bg); border: 2px outset #fff; padding: 8px 12px; min-width: 120px; text-align: center; }
+.fun b { display: block; font-size: 18px; color: var(--bl); }
+.fun span { color: #333; font-size: 11px; }
+
+/* MESSAGES */
+#msg { display: none; padding: 8px; margin-bottom: 12px; border: 1px solid; background: #fff; font-weight: bold; }
+#msg.ok { display: block; color: var(--ok); border-color: var(--ok); background: #e6ffe6; }
+#msg.er { display: block; color: var(--er); border-color: var(--er); background: #ffe6e6; }
+
+/* LETTERS */
+.ltr { border: 2px solid #000; padding: 20px; background: var(--sf); max-width: 720px; font-family: "Times New Roman", Times, serif; font-size: 14px; }
+.ltr h3 { margin: 0; text-align: center; text-decoration: underline; }
+.ltr h5 { background: none; border: none; border-bottom: 1px dashed #000; padding: 0; font-size: 14px; margin-top: 20px; }
+
+/* UTILS */
+input.q { padding: 4px; border: 2px inset #d4d0c8; width: 250px; }
+select.q { padding: 4px; border: 2px inset #d4d0c8; }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--bd); background: var(--bg); padding: 4px 12px; display: flex; gap: 20px; font-size: 11px; color: #333; }
+
+/* BUSY SPINNER (HEAVY CLICKS) */
+#busy { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; cursor: wait; }
+#busy div { background: var(--bg); padding: 20px; border: 2px outset #fff; width: 300px; text-align: center; }
+#busy .pb { margin: 15px 0 5px; }
+
+@media print { header, .tabs, footer, .stp, .bt, #msg, .role-switcher { display: none !important; } .ltr { border: none; padding: 0; } }
+</style></head><body>
+
+<div id="boot"><div class="bx"><h1>TGB Consumer Finance Portal</h1><p style="font-size:11px; margin-top:4px;">Enterprise System - Booting...</p><div class="pb"><i id="bi"></i></div><p id="bm" style="font-size:11px; margin-bottom:0;">Connecting to host...</p></div></div>
+
+<div id="app">
+    <header>
+        <div class="logo">TGB CONSUMER FINANCE PORTAL<small>ENTERPRISE EDITION</small></div>
+        <div class="role-switcher">
+            <span id="huName" style="font-weight:bold;"></span> | 
+            <label for="sysRole">Sys Role:</label>
+            <select id="sysRole" onchange="switchRole(this.value)">
+                <option value="TGB-SE-1021">Sales Executive (Branch)</option>
+                <option value="DSA-0457">DSA Agent</option>
+                <option value="SM-0112">Store Manager</option>
+                <option value="CM-0031">Credit Manager</option>
+                <option value="OPS-0207">Operations Officer</option>
+            </select>
+        </div>
+    </header>
+    <div class="tabs" id="tabs"></div>
+    <div id="work"></div>
+    <footer>
+        <span id="f1"></span>
+        <span id="f4" style="color:var(--ok); font-weight:bold;">Server: Connected</span>
+        <span>Environment: Production</span>
+        <button class="sec" style="font-size:10px; padding:2px 6px;" onclick="reset()">Reset DB</button>
+    </footer>
+</div>
+
+<div id="busy">
+    <div>
+        <b id="bt" style="font-size:13px;">Processing...</b>
+        <div class="pb"><i id="bb"></i></div>
+        <small style="color:#666;">Awaiting mainframe response</small>
+    </div>
+</div>
+
+<script>
+/*LOGIC (Unchanged Data Structures and Validation)*/
+const $=i=>document.getElementById(i),V=i=>$(i)?$(i).value.trim():'',N=i=>parseFloat(V(i))||0,r2=x=>Math.round(x*100)/100;
+const R=n=>'₹'+Math.round(n).toLocaleString('en-IN'),R2=n=>'₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const ts=()=>new Date().toISOString().slice(0,16).replace('T',' '),rnd=n=>Array.from({length:n},()=>Math.floor(Math.random()*10)).join('');
+const age=a=>(Date.now()-new Date(a.dob))/315576e5,D=d=>d.toISOString().slice(0,10);
+const addM=(d,m)=>{const x=new Date(d);x.setMonth(x.getMonth()+m);return x};
+const P={'Consumer Durable':{min:5000,max:500000,ten:24,rt:[14,15,16],fee:1.5},'Two Wheeler':{min:20000,max:500000,ten:48,rt:[11,12.5,14],fee:2,ltv:.9},'Personal Loan':{min:50000,max:1500000,ten:60,rt:[12,14,16],fee:2.5},'Gold Loan':{min:10000,max:1000000,ten:12,rt:[10,11,12],fee:1,ltv:.75}};
+const GR=7100;
+const STEPS=[['SUBMITTED','Application'],['KYC_DONE','KYC'],['ASSET_DONE','Asset details'],['APPROVED','Credit decision'],['OFFER_ACCEPTED','Sanction'],['DOCS_EXECUTED','Documents'],['MANDATE_ACTIVE','e-Mandate'],['DISBURSED','Disbursal']];
+const USERS={'TGB-SE-1021':{n:'Ratan Debbarma',r:'sales',t:'Sales Executive',l:'Agartala Main Branch'},'DSA-0457':{n:'Biplab Das',r:'dsa',t:'DSA Agent',l:'Udaipur, Gomati'},'SM-0112':{n:'Sumitra Roy',r:'store',t:'Store Manager',l:'Debbarma Mobile Point, Agartala'},'CM-0031':{n:'Anirban Saha',r:'credit',t:'Credit Manager',l:'Regional Office, Agartala'},'OPS-0207':{n:'Mina Reang',r:'ops',t:'Operations Officer',l:'Loan Operations Centre'}};
+const PERM={1:['sales','dsa'],2:['sales','dsa','store'],3:['sales','dsa'],4:['sales','dsa','store'],5:['sales','dsa','store'],6:['sales','dsa','store','ops'],7:['ops']},RT={sales:'Sales Executive',dsa:'DSA Agent',store:'Store Manager',credit:'Credit Manager',ops:'Operations Officer'};
+let db,USER='TGB-SE-1021',AID=null,S=null,VIEW='pipe',SEED=false;const KEY='tgb-cf-v4',ROLE=()=>USERS[USER].r,CM=()=>ROLE()=='credit',vis=a=>ROLE()!='dsa'||a.by==USER;
+const chk=j=>{if(!SEED&&!PERM[j].includes(ROLE()))throw Error('Your role ('+USERS[USER].t+') cannot perform this stage. Switch to '+PERM[j].map(r=>RT[r]).join(' or ')+'.')};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
+const rk=a=>a.st=='REFERRED'?2:STEPS.findIndex(s=>s[0]==a.st),closed=a=>a.st=='DECLINED'||a.st=='WITHDRAWN',cur=a=>closed(a)?-1:rk(a)+1,A=()=>db.apps.find(x=>x.id==AID);
+const log=(a,m)=>a.log.unshift([ts(),USER,m]),move=(a,s,m)=>{a.st=s;log(a,m)};
+const at=(a,j)=>{if(closed(a))throw Error('Application is '+a.st.toLowerCase()+'.');const c=cur(a);if(c!=j)throw Error(c>j?'This stage is already complete.':'Complete the earlier stages first.');chk(j)};
+const luhn=s=>{let t=0;[...s].reverse().forEach((c,i)=>{let d=+c;if(i%2){d*=2;if(d>9)d-=9}t+=d});return t%10==0};
+const genIMEI=()=>{const b=rnd(14);for(let k=0;k<10;k++)if(luhn(b+k))return b+k};
+const gen=(n,al)=>Array.from({length:n},()=>al[Math.floor(Math.random()*al.length)]).join(''),VIN='ABCDEFGHJKLMNPRSTUVWXYZ0123456789';
+const bureau=p=>640+[...p].reduce((t,c,i)=>t+c.charCodeAt(0)*(i+7),0)%191;
+const emi=(p,r,n)=>{if(!r)return r2(p/n);r/=1200;return r2(p*r*(1+r)**n/((1+r)**n-1))};
+
+function newApp(d){if(!SEED&&!['sales','dsa'].includes(ROLE()))throw Error('Only a Sales Executive or DSA Agent can create applications.');const p=P[d.fac];if(!p)throw Error('Select a facility type.');if(d.fn.length<2||!d.ln)throw Error('Enter the first and last name.');if(!/^[6-9]\d{9}$/.test(d.mob))throw Error('Mobile number must be 10 digits starting with 6 to 9.');if(!d.dob||age(d)<18)throw Error('Applicant must be at least 18 years old.');if(d.occ=='Salaried'&&!d.co)throw Error('Enter the company name for a salaried applicant.');if(d.addr.length<10)throw Error('Enter the full KYC address.');if(!(d.inc>0))throw Error('Enter the declared monthly income.');if(!(d.amt>=p.min&&d.amt<=p.max))throw Error(d.fac+' amount must be between '+R(p.min)+' and '+R(p.max)+'.');if(!/^[A-Z]{5}\d{4}[A-Z]$/.test(d.pan))throw Error('PAN format is invalid (example ABCDE1234F).');if(!/^\d{12}$/.test(d.aad))throw Error('Aadhaar number must be 12 digits.');if(db.apps.some(a=>a.pan==d.pan&&!closed(a)&&a.st!='DISBURSED'))throw Error('An open application already exists for this PAN.');
+if(d.etb&&!/^\d{11,16}$/.test(d.etb))throw Error('Existing TGB account number must be 11 to 16 digits.');const a={...d,aad:'XXXX XXXX '+d.aad.slice(8),id:'TGB-CF-'+new Date().getFullYear()+'-'+String(db.n.a++).padStart(5,'0'),cid:'CU'+String(db.n.u++).padStart(6,'0'),st:'SUBMITTED',by:USER,src:ROLE()=='dsa'?'DSA':'Branch',log:[]};log(a,'Application submitted');db.apps.push(a);return a}
+
+function kycSend(a){at(a,1);a.kyc={otp:rnd(6)};log(a,'Aadhaar OTP sent');return a.kyc.otp}
+function kycVerify(a,o){at(a,1);if(!a.kyc||!a.kyc.otp)throw Error('Send the Aadhaar OTP first.');if(o!=a.kyc.otp)throw Error('Incorrect OTP. Check the code and try again.');a.kyc={done:1,ckyc:rnd(14),match:96,on:ts()};move(a,'KYC_DONE','Aadhaar e-KYC and CKYC verified')}
+
+const PH=[['realme','P3 5G','6GB+128GB',15999,2025,'Snapdragon 6 Gen 4, 6000 mAh'],['vivo','T4x 5G','6GB+128GB',16999,2025,'Dimensity 7300, 6500 mAh'],['POCO','X7 5G','8GB+128GB',17999,2025,'Dimensity 7300 Ultra, AMOLED'],['OnePlus','N6 5G','4GB+128GB',22499,2026,'Dimensity 6360, 8000 mAh'],['Infinix','Note Edge 5G','6GB+128GB',22445,2026,'Dimensity 7100, AMOLED'],['Motorola','Moto g max 5G','6GB+128GB',22285,2026,'Snapdragon 6s Gen 4, 7000 mAh'],['POCO','M8 5G','6GB+128GB',22948,2026,'Snapdragon 6 Gen 3, AMOLED'],['realme','P4x 5G','6GB+128GB',23589,2025,'Dimensity 7400 Ultra, 7000 mAh'],['OnePlus','Nord CE 6 5G','8GB+128GB',25999,2026,'Snapdragon 7s Gen 4, 8000 mAh'],['vivo','T5x 5G','6GB+128GB',26390,2026,'Dimensity 7400 Turbo, 7200 mAh'],['Samsung','Galaxy M47 5G','6GB+128GB',26999,2026,'Snapdragon 6 Gen 3, Super AMOLED'],['OnePlus','Nord CE 6 Lite 5G','6GB+128GB',26999,2026,'Dimensity 7400 Apex, 7000 mAh'],['Nothing','Phone (3a) Lite','8GB+128GB',27190,2025,'Dimensity 7300 Pro, AMOLED'],['Xiaomi','Redmi Note 17 5G','6GB+128GB',27999,2026,'Snapdragon 4 Gen 4, 8000 mAh'],['Motorola','Edge 70 Fusion','8GB+128GB',28822,2026,'Snapdragon 7s Gen 4, 144Hz AMOLED'],['realme','P4 Power 5G','8GB+128GB',29919,2026,'Dimensity 7400 Ultra, 10001 mAh'],['OnePlus','Nord 6 5G','Base variant',42998,2026,'Performance series, AMOLED'],['POCO','X8 Pro Max 5G','Base variant',42999,2026,'7550 mAh, 6.83in display'],['iQOO','15R 5G','Base variant',46299,2026,'Gaming-focused flagship killer'],['OnePlus','15R 5G','Base variant',47200,2026,'Snapdragon 8 series'],['Samsung','Galaxy A57 5G','Base variant',49999,2026,'Samsung A-series, long updates'],['vivo','V70 5G','Base variant',49999,2026,'Camera-focused, Android 16'],['Google','Pixel 8a','128GB',52999,2026,'Tensor G3'],['Apple','iPhone 15','128GB',69900,2025,'A16 Bionic'],['OnePlus','15 5G','12GB RAM',72999,2025,'Snapdragon 8 Elite Gen 5, 7300 mAh'],['Google','Pixel 9','256GB',79999,2026,'Tensor G4'],['Apple','iPhone 16','128GB',79900,2026,'A18 Chip'],['Samsung','Galaxy S26 5G','12GB+256GB',99999,2026,'Exynos 2600, 6.3in, 7 years updates'],['Samsung','Galaxy S24 Ultra','512GB',129999,2026,'Snapdragon 8 Gen 3'],['Apple','iPhone 15 Pro Max','256GB',139900,2025,'A17 Pro'],['Apple','iPhone 16 Pro Max','256GB',144900,2026,'A18 Pro'],['Samsung','Galaxy Z Fold 6','512GB',164999,2026,'Foldable Display']].map((r,i)=>({id:'PH'+String(i+1).padStart(2,'0'),b:r[0],m:r[1],v:r[2],p:r[3],y:r[4],s:r[5],q:3+(i*7)%9}));
+
+const BK=[['Hero','Splendor Plus','Drum',75000,2026,'97.2cc, 60kmpl'],['Honda','Activa 6G','H-Smart',82000,2026,'109.51cc Scooter'],['Honda','SP 125','Disc',89000,2026,'124cc, 65kmpl'],['Suzuki','Access 125','Ride Connect Edition',95000,2026,'124cc Scooter'],['TVS','Apache RTR 160','4V Disc',125000,2026,'159.7cc, Sport'],['Ather','450X','3.7 kWh',145000,2026,'Electric Scooter'],['Ola','S1 Pro','Gen 2',147000,2026,'Electric Scooter, 195km range'],['Bajaj','Pulsar NS200','Dual ABS',158000,2026,'199.5cc, Naked Sport'],['Yamaha','MT-15 V2','Deluxe',173000,2026,'155cc, Liquid Cooled'],['Royal Enfield','Classic 350','Dual Channel ABS',220000,2026,'349cc, Cruiser']].map((r,i)=>({id:'BK'+String(i+1).padStart(2,'0'),b:r[0],m:r[1],v:r[2],p:r[3],y:r[4],s:r[5],q:5+(i*2)%7}));
+
+const SCH=[['ZDP','Zero down payment',0,2,2.5,[6,9,12],c=>c.score>=750&&!c.fl.includes('High ticket vs income')&&c.inv<=40000&&(c.fl.includes('Existing TGB customer')||c.fl.includes('Government employer')||c.inc>=25000),'Needs bureau 750+, phone up to ₹40,000, no high-ticket flag, and a TGB customer, government employer or income of ₹25,000+'],['NCE','No-cost EMI, brand funded (0% interest)',10,null,1,[3,6,9],c=>c.score>=750&&['Samsung','OnePlus','Motorola','Apple','Google'].includes(c.brand),'Needs bureau 750+ and a premium brand phone'],['DP10','10% down payment',10,.5,1.5,[6,9,12,18],c=>c.score>=700&&!c.fl.includes('High ticket vs income'),'Needs bureau 700+ and no high-ticket flag'],['DP20','20% down payment',20,0,1.5,[6,9,12,18,24],c=>c.score>=685,'Needs bureau 685+'],['DP30','30% down payment, deviation approved',30,-.5,1.5,[6,9,12,18,24],c=>!!c.dev,'Available after credit manager deviation approval']].map(r=>({id:r[0],n:r[1],dp:r[2],adj:r[3],fee:r[4],ten:r[5],ok:r[6],why:r[7]}));
+
+function setAsset(a,d){at(a,2);const f=a.fac,x={};
+if(f=='Consumer Durable'||f=='Two Wheeler'){if(!d.dealer)throw Error('Select a dealer. Onboard one in the Dealers tab if the list is empty.');x.dealer=d.dealer}
+if(f=='Consumer Durable'){const ph=PH.find(y=>y.id==d.pid);if(!ph)throw Error('Select a phone from the catalogue.');if(!/^\d{15}$/.test(d.i1)||!luhn(d.i1))throw Error('IMEI 1 must be a valid 15-digit IMEI.');if(d.i2&&(!/^\d{15}$/.test(d.i2)||!luhn(d.i2)))throw Error('IMEI 2 is not a valid 15-digit IMEI.');Object.assign(x,{brand:ph.b,model:ph.b+' '+ph.m+' ('+ph.v+')',inv:ph.p,i1:d.i1,i2:d.i2})}
+if(f=='Two Wheeler'){const bk=BK.find(y=>y.id==d.bkid);if(!bk)throw Error('Select a two-wheeler from the catalogue.');if(d.eng.length<8)throw Error('Engine number must be at least 8 characters.');if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(d.vin))throw Error('Chassis number must be a 17-character VIN (no I, O or Q).');Object.assign(x,{brand:bk.b,model:bk.b+' '+bk.m+' ('+bk.v+')',inv:bk.p,eng:d.eng,vin:d.vin})}
+if(f=='Personal Loan'){if(!d.purpose)throw Error('Select the loan purpose.');x.purpose=d.purpose}
+if(f=='Gold Loan'){if(!(d.n>0&&d.gw>0&&d.nw>0))throw Error('Enter ornament count, gross weight and net weight.');if(d.nw>d.gw)throw Error('Net weight cannot exceed gross weight.');if(d.asy.length<3)throw Error('Enter the assayer employee ID.');let calcVal=r2(d.nw*GR*d.pur/22);let finalVal=d.forceVal>0?d.forceVal:calcVal;Object.assign(x,{n:d.n,gw:d.gw,nw:d.nw,pur:d.pur+'K',asy:d.asy,val:finalVal,forceVal:d.forceVal})}
+a.asset=x;move(a,'ASSET_DONE','Asset details captured')}
+
+function decide(a,obl,co){chk(3);if(a.st!='ASSET_DONE'&&a.st!='REFERRED')at(a,3);const p=P[a.fac],ag=age(a),inc=a.inc+(co.inc||0),score=bureau(a.pan),t=score>=750?0:score>=700?1:2,rate=p.rt[t],no=[],rf=[],fl=[];
+if(co.inc>0&&!/^[A-Z]{5}\d{4}[A-Z]$/.test(co.pan))throw Error('Enter a valid co-applicant PAN.');
+if(ag<21||ag>65)no.push('Applicant age '+Math.floor(ag)+' is outside 21 to 65');
+if(a.occ=='Student'&&!(co.inc>0))no.push('Student profile needs a co-applicant with income');
+const mi={Salaried:15000,'Self-Employed':20000,Farmer:12000,Student:0}[a.occ];if(inc<mi)no.push('Income is below the minimum of '+R(mi));
+if(score<650)no.push('Bureau score '+score+' is below 650');else if(score<685)rf.push('Bureau score '+score+' is between 650 and 684');
+let el;if(a.fac=='Gold Loan')el=a.asset.val*p.ltv;else{const mx=inc*.5-obl;if(mx<=0)no.push('Existing obligations exceed 50% of income');const r=rate/1200;el=mx>0?mx*(1-(1+r)**-p.ten)/r:0;el=Math.min(el,p.max);if(p.ltv)el=Math.min(el,a.asset.inv*p.ltv);else if(a.asset.inv)el=Math.min(el,a.asset.inv)}
+el=a.fac=='Consumer Durable'&&el>=a.asset.inv?a.asset.inv:Math.floor(Math.min(el,p.max)/1000)*1000;if(el<p.min&&!no.length)no.push('Eligible limit '+R(el)+' is below the product minimum '+R(p.min));
+if(a.etb)fl.push('Existing TGB customer');if(/govt|government|school|panchayat|psu|railway|police|bank/i.test(a.co||''))fl.push('Government employer');if(a.asset.inv&&a.asset.inv>inc*1.5)fl.push('High ticket vs income');if(co.inc>0)fl.push('Co-applicant added');if(a.occ=='Farmer')fl.push('Agriculture income, seasonal');if(score<700)fl.push('Thin bureau profile');
+const dec=no.length?'DECLINED':rf.length?'REFERRED':'APPROVED';a.co=co.inc>0?co:null;a.uw={score,tier:'ABC'[t],rate,elig:el,max:p.ten,obl,flags:fl,reasons:[...no,...rf],dec};if(dec=='APPROVED'&&a.fac!='Consumer Durable'&&a.amt>el)a.uw.reasons.push('Limit restricted to '+R(el)+' against '+R(a.amt)+' requested');move(a,dec,'Credit engine decision: '+dec)}
+
+function creditAct(a,ok,note,lim){if(!CM())throw Error('Only a Credit Manager can action this. Switch your role to Credit Manager.');if(a.st!='REFERRED')throw Error('Application is not referred.');if(note.length<10)throw Error('Enter a deviation note of at least 10 characters.');if(ok){const m=Math.min(P[a.fac].max,a.amt);if(!(lim>=P[a.fac].min&&lim<=m))throw Error('Approved limit must be between '+R(P[a.fac].min)+' and '+R(m)+'.');a.uw.elig=lim;a.uw.dev=1;move(a,'APPROVED','Deviation approved: '+note)}else move(a,'DECLINED','Declined by credit manager: '+note)}
+
+function forceApprove(a, amt){
+    chk(3);
+    if(!CM())throw Error('Only a Credit Manager can manually force approve applications.');
+    if(!(amt>=P[a.fac].min))throw Error('Force approved amount must be at least the product minimum of '+R(P[a.fac].min)+'.');
+    a.uw={score:750,tier:'A',rate:P[a.fac].rt[0],elig:amt,max:P[a.fac].ten,obl:0,flags:['Manual Force Override Appied'],reasons:[],dec:'APPROVED',dev:1};
+    move(a,'APPROVED','Manually force approved client application for limit '+R(amt));
+}
+
+const ctx=a=>({score:a.uw.score,fl:a.uw.flags||[],inc:a.inc+(a.co?a.co.inc:0),inv:a.asset.inv,brand:a.asset.brand,dev:a.uw.dev});
+function calc(a,amt,ten,rate,fp){const e=emi(amt,rate,ten),fee=r2(amt*fp/100),gst=r2(fee*.18);return{amt,ten,rate,emi:e,fee,gst,net:r2(amt-fee-gst),total:r2(e*ten),int:r2(e*ten-amt)}}
+
+function offer(a,amt,ten,sid,dp){at(a,4);const u=a.uw,p=P[a.fac];let sc=null,rate=u.rate,fp=p.fee,dpv=0;
+if(a.fac=='Consumer Durable'){sc=SCH.find(x=>x.id==sid);if(!sc)throw Error('Select a scheme.');if(!sc.ok(ctx(a)))throw Error('Not eligible for this scheme. '+sc.why+'.');if(!sc.ten.includes(ten))throw Error('Select a tenure offered under this scheme.');const inv=a.asset.inv,mn=Math.max(Math.ceil(inv*sc.dp/100),inv-u.elig);if(!(dp>=mn&&dp<inv))throw Error('Down payment must be at least '+R(mn)+' and less than the phone price.');amt=inv-dp;dpv=dp;rate=sc.adj==null?0:r2(u.rate+sc.adj);fp=sc.fee;if(amt<p.min)throw Error('Loan amount is below the minimum of '+R(p.min)+'. Reduce the down payment.')}
+else{if(!(amt>=p.min&&amt<=u.elig))throw Error('Amount must be between '+R(p.min)+' and the eligible limit '+R(u.elig)+'.');if(a.asset.inv&&amt>a.asset.inv)throw Error('Loan amount cannot exceed the invoice value.');if(!(ten>=3&&ten<=u.max))throw Error('Tenure must be 3 to '+u.max+' months.')}
+const o=calc(a,amt,ten,rate,fp);if(a.fac!='Gold Loan'&&(u.obl+o.emi)/(a.inc+(a.co?a.co.inc:0))>.5)throw Error('EMI of '+R2(o.emi)+' breaches the 50% FOIR limit. Reduce the amount or extend the tenure.');
+a.offer={...o,no:'SAN'+rnd(8),exp:D(new Date(Date.now()+2592e6)),sn:sc?sc.n:'Standard',sid:sc?sc.id:'',dp:dpv};move(a,'OFFER_ACCEPTED','Offer accepted ('+a.offer.sn+'), sanction '+a.offer.no+' issued')}
+
+function docSend(a,kfs){at(a,5);if(!kfs)throw Error('Tick the Key Fact Statement acknowledgement first.');a.docs={otp:rnd(6)};log(a,'KFS acknowledged, eSign OTP sent')}
+function docSign(a,o){at(a,5);if(!a.docs)throw Error('Acknowledge the KFS and send the eSign OTP first.');if(o!=a.docs.otp)throw Error('Incorrect eSign OTP.');a.docs={on:ts(),done:1};move(a,'DOCS_EXECUTED','Loan agreement, KFS and DPN signed')}
+
+function mandate(a,d){at(a,6);if(!d.bank)throw Error('Select the bank.');if(!/^\d{9,18}$/.test(d.acc))throw Error('Account number must be 9 to 18 digits.');if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(d.ifsc))throw Error('IFSC format is invalid (example HDFC0001234).');if(!(d.day>=1&&d.day<=28))throw Error('EMI date must be between 1 and 28.');a.mand={bank:d.bank,acc:'XXXXXX'+d.acc.slice(-4),ifsc:d.ifsc,day:d.day,umrn:'UMRN'+rnd(12)};move(a,'MANDATE_ACTIVE','e-Mandate registered '+a.mand.umrn)}
+
+function storeConfirm(a){if(!SEED&&ROLE()!='store')throw Error('Only a Store Manager can confirm the down payment and handover.');if(a.st!='MANDATE_ACTIVE')throw Error('Complete the e-Mandate stage first.');if(a.fac!='Consumer Durable')throw Error('Not applicable for this facility.');a.dpOk=1;log(a,'Down payment '+R(a.offer.dp)+' collected and device handed over')}
+
+function disburse(a){if(a.st=='DISBURSED')throw Error('Already disbursed. UTR '+a.disb.utr+'.');at(a,7);if(a.fac=='Consumer Durable'&&!a.dpOk)throw Error('The store manager must confirm the down payment and device handover first.');const dl=db.dealers.find(x=>x.code==a.asset.dealer),o=a.offer,f=new Date();f.setDate(a.mand.day);const first=D(addM(f,1));
+a.disb={utr:'UTR'+rnd(12),to:dl&&(a.fac=='Consumer Durable'||a.fac=='Two Wheeler')?dl.name:a.fn+' '+a.ln,amt:o.net,on:ts()};const L={lan:'LAN'+({'Consumer Durable':'CD','Two Wheeler':'TW','Personal Loan':'PL','Gold Loan':'GL'}[a.fac])+String(db.n.l++).padStart(6,'0'),app:a.id,nm:a.fn+' '+a.ln,fac:a.fac,amt:o.amt,rate:o.rate,ten:o.ten,emi:o.emi,first,utr:a.disb.utr,to:a.disb.to};db.loans.push(L);a.lan=L.lan;move(a,'DISBURSED','Disbursed '+R2(o.net)+' to '+a.disb.to+', '+L.lan)}
+
+function withdraw(a){if(closed(a)||a.st=='DISBURSED')throw Error('This application cannot be withdrawn.');move(a,'WITHDRAWN','Application withdrawn')}
+function addDealer(d){if(d.nm.length<3)throw Error('Enter the dealership name.');if(!d.own)throw Error('Enter the legal owner name.');if(!/^[6-9]\d{9}$/.test(d.mob))throw Error('Mobile number must be 10 digits.');if(!/^\S+@\S+\.\S+$/.test(d.em))throw Error('Enter a valid email address.');if(d.ad.length<10)throw Error('Enter the full dealership address.');const x={...d,code:'DLR'+String(db.n.d++).padStart(4,'0'),on:ts()};db.dealers.push(x);return x}
+function sched(L){let b=L.amt,r=L.rate/1200,rows=[];for(let i=1;i<=L.ten;i++){const it=r2(b*r),pr=i==L.ten?b:r2(L.emi-it);b=r2(b-pr);rows.push([i,D(addM(L.first,i-1)),R2(pr+it),R2(it),R2(pr),R2(Math.max(b,0))])}return rows}
+
+function seed(){db={apps:[],dealers:[],loans:[],n:{a:1,d:1,l:1,u:1}};SEED=true;const oldUser=USER;USER='TGB-SE-1021';const fp=(lo,hi)=>{for(let i=0;i<9999;i++){const p='QWERT'+(1000+i)+'Z',s=bureau(p);if(s>=lo&&s<=hi)return p}};
+const d1=addDealer({nm:'Debbarma Mobile Point',et:'Proprietorship',own:'Sunil Debbarma',mob:'9436120045',em:'dmp@example.com',ad:'Shop 7, Battala Bazar, Agartala 799001'});addDealer({nm:'Tripura Electronics',et:'Partnership Firm',own:'Gautam Saha',mob:'9862033310',em:'tripuraelec@example.com',ad:'Main Road, Udaipur, Gomati 799120'});
+const mk=(o,x)=>newApp({fac:'Consumer Durable',fn:o[0],ln:o[1],mob:o[2],dob:o[3],occ:o[4],emp:'E'+rnd(5),co:o[8]||'',addr:o[5],inc:o[6],amt:o[7],pan:x,aad:rnd(12),etb:o[9]||''});
+const a=mk(['Rajib','Debbarma','9436701234','1988-04-09','Salaried','Kakraban, Gomati, Tripura 799145',38000,26999,'Tripura Government School'],fp(750,830));kycVerify(a,(kycSend(a),a.kyc.otp));setAsset(a,{dealer:d1.code,pid:'PH11',i1:genIMEI(),i2:''});decide(a,0,{});offer(a,0,9,'ZDP',0);docSend(a,1);docSign(a,a.docs.otp);mandate(a,{bank:'Tripura Gramin Bank',acc:'100200345678',ifsc:'PUNB0123400',day:5});storeConfirm(a);disburse(a);
+const b=mk(['Sumon','Reang','9862211223','1985-12-02','Farmer','Ambassa, Dhalai, Tripura 799289',22000,25999],fp(650,684));kycVerify(b,(kycSend(b),b.kyc.otp));setAsset(b,{dealer:d1.code,pid:'PH09',i1:genIMEI(),i2:''});decide(b,0,{});
+USER='DSA-0457';const c=mk(['Pinki','Majumder','9774098765','1995-11-30','Self-Employed','Ward 4, Dharmanagar, North Tripura 799250',30000,26390],fp(700,830));kycSend(c);
+SEED=false;USER=oldUser;save()}
+
+/*UI RENDERING*/
+const inp=(id,l,v='',t='text',x='')=>'<label for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" value="'+v+'" '+x+'>';
+const sel=(id,l,o,x='')=>'<label for="'+id+'">'+l+'</label><select id="'+id+'" '+x+'>'+o.map(v=>Array.isArray(v)?'<option value="'+v[0]+'">'+v[1]+'</option>':'<option>'+v+'</option>').join('')+'</select>';
+const fm=x=>'<div class="fm">'+x+'</div>',b=(l,c,k='',s='')=>'<button class="'+k+'" onclick="act(()=>{'+c+'},\''+s+'\')">'+l+'</button>',bt=(...x)=>'<div class="bt">'+x.join('')+'</div>';
+const T=(h,rows)=>'<div class="tw"><table><tr>'+h.map(x=>'<th>'+x+'</th>').join('')+'</tr>'+(rows.length?rows.map(r=>'<tr>'+r.map(c=>'<td'+(/^₹/.test(String(c))?' class="n"':'')+'>'+c+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+h.length+'">No records found.</td></tr>')+'</table></div>';
+const chip=s=>'<span class="ch '+({DISBURSED:'g',APPROVED:'g',REFERRED:'a',DECLINED:'r',WITHDRAWN:'r'}[s]||'')+'">'+s.replace(/_/g,' ').toLowerCase()+'</span>';
+const kv=o=>T(['Field','Value'],o);
+
+function busy(fn,key){const m=STEPMSG[key]||STEPMSG.def;$('busy').style.display='flex';$('bt').textContent=m[0];$('bb').style.width='0';let i=0;
+setTimeout(()=>{$('bb').style.width=(100/m.length)+'%'},40);
+const t=setInterval(()=>{i++;if(i<m.length){$('bt').textContent=m[i];$('bb').style.width=((i+1)*100/m.length)+'%'}else{clearInterval(t);setTimeout(()=>{$('busy').style.display='none';fn()},400)}},750)}
+
+function msg(t,ok){const m=$('msg');if(m){m.className=ok?'ok':'er';m.textContent=t}}
+function act(fn,key){busy(()=>{try{const m=fn();save();S=null;renderView(VIEW,m,1)}catch(e){msg(e.message,0)}},key)}
+
+function prev(){const a=A();if(!$('pv')||!a||!a.uw)return;let am,rate=a.uw.rate,fp=P[a.fac].fee;const tn=N('tn');if($('sc')){const sc=SCH.find(x=>x.id==V('sc'));am=a.asset.inv-N('dp');if(sc){rate=sc.adj==null?0:r2(a.uw.rate+sc.adj);fp=sc.fee}}else am=N('sa');if(am>0&&tn>0){const o=calc(a,am,tn,rate,fp);$('pv').innerHTML=T(['Loan amount','Monthly EMI','Rate p.a.','Total interest','Processing fee incl. GST','Net disbursement'],[[R(am),R2(o.emi),o.rate+'%',R2(o.int),R2(o.fee+o.gst),R2(o.net)]])}}
+
+function letter(a){const o=a.offer,s=a.asset;return '<div class="ltr"><h3>TGB CONSUMER FINANCE</h3><div style="text-align:center;font-size:12px;">Sponsored by Punjab National Bank</div><h5>Sanction Letter: '+o.no+'</h5>'+T(['Particulars','Details'],[['Application no.',a.id],['Name',a.fn+' '+a.ln],['Address',a.addr],['Phone',a.mob],['Facility type',a.fac],['Scheme',o.sn||'Standard'],['Down payment',R(o.dp||0)],['Sanction amount',R(o.amt)],['Loan tenor',o.ten+' months'],['Rate of interest (APR)',o.rate+'%'],['Monthly EMI',R2(o.emi)],['Payment mode','e-Mandate / NACH'],['Processing fees',R2(o.fee+o.gst)+' incl. GST'],['Disbursement amount',R2(o.net)],['Asset IMEI / serial',s.i1||'-'],['Engine and chassis no.',s.eng?s.eng+' / '+s.vin:'-'],['Valid until',o.exp]])+'<p>The company reserves the right to cancel the application on valid grounds before disbursement.</p><p style="margin-top:30px;">_________________________<br>Authorised Signatory<br>Tripura Gramin Bank</p>'+bt('<button onclick="window.print()">Print letter</button>')+'</div>'}
+
+const dlOpts=()=>db.dealers.map(d=>[d.code,d.code+' - '+d.nm]);
+const PN=[
+a=>kv([['Customer ID',a.cid],['Source',(a.src||'Branch')+' ('+a.by+')'],['Existing TGB account',a.etb||'-'],['Applicant',a.fn+' '+a.ln],['Mobile',a.mob],['Date of birth',a.dob],['Occupation',a.occ],['Company',a.co||'-'],['Monthly income',R(a.inc)],['Requested amount',R(a.amt)],['PAN',a.pan],['Aadhaar',a.aad],['Address',a.addr]]),
+(a,dn)=>dn?kv([['CKYC number',a.kyc.ckyc],['Aadhaar e-KYC','Verified'],['Name match',a.kyc.match+'%'],['Verified on',a.kyc.on]]):'<p>Aadhaar '+a.aad+', mobile '+a.mob.slice(0,2)+'XXXXXX'+a.mob.slice(-2)+'.</p>'+fm(inp('otp','Aadhaar OTP','','text','inputmode="numeric" maxlength="6"'))+bt(b('Send OTP',"const o=kycSend(A());return 'OTP sent to the registered mobile. Demo OTP: '+o"),b('Verify OTP & Fetch CKYC',"kycVerify(A(),V('otp'));return 'KYC completed and CKYC record fetched.'",'sec','kyc')),
+(a,dn)=>{if(dn)return kv(Object.entries(a.asset).map(([k,v])=>[k,v]));const f=a.fac;let h='';
+if(f=='Consumer Durable')h=fm(sel('dl','Dealer / store',dlOpts())+sel('ph','Phone (in stock)',PH.map(p=>[p.id,p.b+' '+p.m+' '+p.v+' - '+R(p.p)]))+inp('i1','IMEI 1','','text','maxlength="15"')+inp('i2','IMEI 2 (optional)','','text','maxlength="15"'))+bt('<button class="sec" onclick="$(\'i1\').value=genIMEI()">Generate IMEI 1</button>','<button class="sec" onclick="$(\'i2\').value=genIMEI()">Generate IMEI 2</button>')+'<p>The invoice value is the catalogue price. See the Catalogue tab for specs and stock.</p>';
+if(f=='Two Wheeler')h=fm(sel('dl','Dealer',dlOpts())+sel('bk','Vehicle model',BK.map(p=>[p.id,p.b+' '+p.m+' '+p.v+' - '+R(p.p)]))+inp('en','Engine number')+inp('vn','Chassis number (VIN)','','text','maxlength="17"'))+bt('<button class="sec" onclick="$(\'en\').value=gen(10,\'ABCDEFGHJKLMNPRSTUVWXYZ0123456789\');$(\'vn\').value=gen(17,VIN)">Generate engine & chassis</button>');
+if(f=='Personal Loan')h=fm(sel('pu','Purpose of loan',['Medical Emergency','Home Renovation','Education','Wedding','Debt Consolidation','Other']));
+if(f=='Gold Loan')h=fm(inp('on','Number of ornaments','','number')+inp('gw','Gross weight (g)','','number')+inp('nw','Net weight, excluding stones (g)','','number')+sel('pr','Purity',[['22','22 Karat'],['24','24 Karat'],['18','18 Karat']])+inp('as','Assayer employee ID')+inp('fv','Manual Value Force Override (₹)','','number','placeholder="Optional, bypasses formula"'))+'<p>Reference rate: '+R(GR)+' per gram (22K). Loan to value 75%.</p>';
+return h+bt(b('Save Asset Details',"setAsset(A(),{dealer:V('dl'),pid:V('ph'),bkid:V('bk'),model:V('md'),i1:V('i1'),i2:V('i2'),eng:V('en'),vin:V('vn').toUpperCase(),inv:N('iv'),purpose:V('pu'),n:N('on'),gw:N('gw'),nw:N('nw'),pur:N('pr'),asy:V('as'),forceVal:N('fv')});return 'Asset details saved.'"))},
+a=>{
+    const u=a.uw;
+    let h='';
+    if(a.st=='ASSET_DONE') h += '<p>Bureau score is pulled and the credit engine applies age, income, bureau and 50% FOIR rules.</p>'+fm(inp('ob','Existing monthly EMI obligations (₹)','0','number')+inp('cn','Co-applicant name (optional)')+inp('cp','Co-applicant PAN')+inp('ci','Co-applicant monthly income (₹)','0','number'))+bt(b('Run Credit Decision',"const a=A();decide(a,N('ob'),{nm:V('cn'),pan:V('cp').toUpperCase(),inc:N('ci')});return 'Credit engine decision: '+a.uw.dec+'.'",'','uw'));
+    if(u) {
+        h += T(['Bureau score','Risk tier','Rate p.a.','Max tenure','Eligible limit','Decision'],[[u.score,u.tier,u.rate+'%',u.max+' months',R(u.elig),chip(u.dec)]])+'<p>System flags: '+((u.flags||[]).length?u.flags.join(', '):'none')+'</p>'+(u.reasons.length?'<h5>Decision notes</h5><ul>'+u.reasons.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'');
+        if(a.st=='REFERRED') h+=CM()?fm(inp('lm','Approved limit (₹)',u.elig,'number')+inp('nt','Deviation note'))+bt(b('Approve with Deviation',"creditAct(A(),1,V('nt'),N('lm'));return 'Deviation approved.'"),b('Decline Application',"creditAct(A(),0,V('nt'));return 'Application declined.'",'dn')):'<p>Referred to the Credit Manager. Switch to Credit Manager role to review it.</p>';
+    }
+    if((a.st=='ASSET_DONE' || a.st=='REFERRED') && CM()){
+        h += '<h5>Credit Manager Manual Force Option</h5><p style="color:var(--er); font-weight:bold;">Use carefully. This forcefully overrides and approves client applications, bypassing standard underwriting rules.</p>'+fm(inp('fa_amt','Force Approve Limit (₹)', a.amt, 'number'))+bt(b('Force Approve Client Application',"forceApprove(A(), N('fa_amt')); return 'Application forcibly approved by Credit Manager.'",'dn','uw'));
+    }
+    return h;
+},
+(a,dn)=>{if(dn)return letter(a);const u=a.uw;if(a.fac!='Consumer Durable')return '<p>Approved limit '+R(u.elig)+' at '+u.rate+'% p.a. Choose the amount and tenure.</p>'+fm(inp('sa','Loan amount (₹)',Math.min(a.amt,u.elig),'number','oninput="prev()"')+inp('tn','Tenure (months)',u.max,'number','oninput="prev()"'))+'<div id="pv"></div>'+bt(b('Accept Offer & Sanction',"offer(A(),N('sa'),N('tn'));return 'Offer accepted and sanction letter generated.'"));
+const c=ctx(a),inv=a.asset.inv,mn=x=>Math.max(Math.ceil(inv*x.dp/100),inv-u.elig),el=SCH.filter(x=>x.ok(c));
+return '<p>'+a.asset.model+' at '+R(inv)+'. Eligible limit '+R(u.elig)+'. System flags: '+((u.flags||[]).length?u.flags.join(', '):'none')+'.</p>'+T(['Scheme','Minimum down payment','Rate p.a.','Tenures','Status'],SCH.map(x=>[x.n,R(mn(x)),x.adj==null?'0% (brand funded)':r2(u.rate+x.adj)+'%',x.ten.join(', ')+' months',x.ok(c)?'<span class="ch g">eligible</span>':'<span class="ch r">not eligible</span> '+x.why]))+fm(sel('sc','Scheme',el.map(x=>[x.id,x.n]),'onchange="schChg()"')+inp('dp','Down payment (₹)','','number','oninput="prev()"')+sel('tn','Tenure (months)',[6],'onchange="prev()"'))+'<div id="pv"></div>'+bt(b('Accept Offer & Sanction',"offer(A(),0,N('tn'),V('sc'),N('dp'));return 'Offer accepted and sanction letter generated.'"))},
+(a,dn)=>dn?T(['Document','Status','Signed on'],[['Loan agreement','Executed',a.docs.on],['Key Fact Statement','Acknowledged',a.docs.on],['Demand promissory note','Executed',a.docs.on]]):'<p>Documents: loan agreement, Key Fact Statement and demand promissory note.</p>'+fm('<label for="kf">I acknowledge the Key Fact Statement</label><input type="checkbox" id="kf" style="width:auto; margin:0">'+inp('so','eSign OTP','','text','maxlength="6"'))+bt(b('Send eSign OTP',"docSend(A(),$('kf').checked);return 'eSign OTP sent. Demo OTP: '+A().docs.otp"),b('Sign Documents',"docSign(A(),V('so'));return 'Documents executed.'",'sec','doc')),
+(a,dn)=>dn?kv([['Bank',a.mand.bank],['Account',a.mand.acc],['IFSC',a.mand.ifsc],['EMI date','Day '+a.mand.day+' of each month'],['UMRN',a.mand.umrn]]):fm(sel('bk','Bank',['Tripura Gramin Bank','Punjab National Bank','State Bank of India','HDFC Bank','ICICI Bank','Axis Bank'])+inp('ac','Account number')+inp('if','IFSC code','','text','maxlength="11"')+inp('dy','EMI date (1 to 28)','5','number'))+bt(b('Register e-Mandate',"mandate(A(),{bank:V('bk'),acc:V('ac'),ifsc:V('if').toUpperCase(),day:N('dy')});return 'e-Mandate registered. UMRN '+A().mand.umrn")),
+(a,dn)=>{const o=a.offer,dl=db.dealers.find(x=>x.code==(a.asset||{}).dealer),cd=a.fac=='Consumer Durable';if(dn)return kv([['Loan account',a.lan],['UTR',a.disb.utr],['Paid to',a.disb.to],['Net amount',R2(a.disb.amt)],['Disbursed on',a.disb.on]]);
+return T(['Pre-disbursal check','Status'],[['KYC verified',a.kyc&&a.kyc.done?'Passed':'Pending'],['Asset details captured',a.asset?'Passed':'Pending'],['Credit approved',a.uw&&a.uw.dec!='DECLINED'?'Passed':'Pending'],['Documents executed',a.docs&&a.docs.done?'Passed':'Pending'],['e-Mandate active',a.mand?'Passed':'Pending']].concat(cd?[['Down payment of '+R(o.dp)+' collected and device handed over',a.dpOk?'Passed':'Pending store manager']]:[]))+'<p>Net amount '+R2(o.net)+' will be paid to '+(dl&&(cd||a.fac=='Two Wheeler')?dl.name:a.fn+' '+a.ln)+'.</p>'+bt(cd&&!a.dpOk?b('Confirm down payment & handover',"storeConfirm(A());return 'Down payment and device handover confirmed.'"):'',b('Authorise & Disburse',"disburse(A());return 'Loan disbursed. UTR '+A().disb.utr+'.'",'','pay'))}];
+
+function panel(a,i){const c=cur(a);if(closed(a)&&i>0)return '<p>This application is '+a.st.toLowerCase()+'. No further actions are available.</p>'+(a.uw&&a.uw.reasons.length?'<ul>'+a.uw.reasons.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'');if(i>c)return '<p>This stage unlocks after the earlier stages are complete.</p>';return PN[i](a,i<c)}
+
+const VW={
+pipe:()=>{const c=db.apps.filter(a=>vis(a)&&!closed(a));return '<h2>Application Pipeline</h2><div class="fun">'+STEPS.map((s,i)=>'<div><b>'+c.filter(a=>cur(a)==i+1).length+'</b><span>Awaiting '+STEPS[i][1].toLowerCase()+'</span></div>').join('').replace('Awaiting application','Awaiting KYC')+'<div><b>'+db.apps.filter(a=>a.st=='DISBURSED').length+'</b><span>Disbursed</span></div><div><b>'+db.apps.filter(closed).length+'</b><span>Declined or withdrawn</span></div></div><div class="bt"><input class="q" id="q" placeholder="Search by name, mobile, PAN or app no." oninput="tbl()"><select class="q" id="fl" onchange="tbl()"><option value="">All statuses</option>'+['SUBMITTED','KYC_DONE','ASSET_DONE','REFERRED','APPROVED','OFFER_ACCEPTED','DOCS_EXECUTED','MANDATE_ACTIVE','DISBURSED','DECLINED','WITHDRAWN'].map(s=>'<option>'+s+'</option>').join('')+'</select></div><div id="tb"></div>'},
+new:()=>'<h2>New Application Initiation</h2><div class="card">'+fm(sel('fc','Facility type',Object.keys(P))+inp('fn','First name')+inp('ln','Last name')+inp('mo','Mobile number','','text','maxlength="10" inputmode="numeric"')+inp('db','Date of birth','','date')+sel('oc','Occupation type',['Salaried','Self-Employed','Farmer','Student'])+inp('ei','Employee ID')+inp('cm','Company name')+inp('ad','Full KYC address')+inp('ic','Declared monthly income (₹)','','number')+inp('am','Requested loan amount (₹)','','number')+inp('pn','PAN number','','text','maxlength="10"')+inp('aa','Aadhaar number','','text','maxlength="12" inputmode="numeric"')+inp('ex','Existing TGB account number (optional)','','text','maxlength="16" inputmode="numeric"'))+bt(b('Submit Application',"const a=newApp({fac:V('fc'),fn:V('fn'),ln:V('ln'),mob:V('mo'),dob:V('db'),occ:V('oc'),emp:V('ei'),co:V('cm'),addr:V('ad'),inc:N('ic'),amt:N('am'),pan:V('pn').toUpperCase(),aad:V('aa'),etb:V('ex')});AID=a.id;VIEW='app';return 'Application '+a.id+' created. Continue with KYC.'"))+'</div>',
+app:()=>{const a=A(),c=cur(a);if(S==null)S=Math.max(0,Math.min(c,7));return '<h2>'+a.id+' - '+a.fn+' '+a.ln+' '+chip(a.st)+'</h2><p>'+a.fac+', requested '+R(a.amt)+(a.lan?', loan account '+a.lan:'')+'</p><div class="stp">'+STEPS.map((s,i)=>'<a class="'+(i<c?'d':i==c?'c':'l')+(i==S?' s':'')+'" '+(i<=c||closed(a)?'onclick="S='+i+';goNav(\'app\')"':'')+'>'+(i+1)+'. '+s[1]+'</a>').join('')+'</div><div class="card"><div id="msg"></div>'+panel(a,S)+'</div>'+(closed(a)||a.st=='DISBURSED'?'':bt(b('Withdraw application',"withdraw(A());return 'Application withdrawn.'",'sec')))+'<h5>System Activity Log</h5>'+T(['Time','User','Event'],a.log.slice(0,10))},
+credit:()=>'<h2>Credit Operations Desk</h2><p>Applications referred by the credit engine for manual underwriting review.</p>'+T(['Application','Applicant','Facility','Amount','Bureau score','Reason','',],db.apps.filter(a=>a.st=='REFERRED').map(a=>[a.id,a.fn+' '+a.ln,a.fac,R(a.amt),a.uw.score,a.uw.reasons[0]||'-','<button onclick="openA(\''+a.id+'\')">Review</button>']))+'<h5>Recent Underwriting Decisions</h5>'+T(['Application','Applicant','Status','Last event'],db.apps.filter(a=>a.uw&&a.st!='REFERRED').map(a=>[a.id,a.fn+' '+a.ln,chip(a.st),a.log[0][2]])),
+loans:()=>'<h2>Loan Master Records</h2>'+fm(sel('ln','Loan account',db.loans.map(l=>[l.lan,l.lan+' - '+l.nm])))+bt('<button class="sec" onclick="shs()">Show Repayment Schedule</button>')+'<div id="out"></div>'+T(['Loan account','Application','Customer','Facility','Sanctioned','Rate','Tenure','EMI','First EMI','UTR','Paid to'],db.loans.map(l=>[l.lan,l.app,l.nm,l.fac,R(l.amt),l.rate+'%',l.ten+' m',R2(l.emi),l.first,l.utr,l.to])),
+dealers:()=>'<h2>Partner & Dealer Onboarding</h2><div class="card">'+fm(inp('dn','Dealership or store name')+sel('de','Entity type',['Proprietorship','Partnership Firm','Private Limited','LLP'])+inp('do','Legal owner name')+inp('dm','Mobile number','','text','maxlength="10"')+inp('dem','Email address','','email')+inp('da','Dealership full address'))+bt(b('Generate ID & Onboard',"const d=addDealer({nm:V('dn'),et:V('de'),own:V('do'),mob:V('dm'),em:V('dem'),ad:V('da')});return 'Dealer onboarded. Dealer code '+d.code"))+'</div>'+T(['Code','Dealership','Entity type','Owner','Mobile','Email','Onboarded'],db.dealers.map(d=>[d.code,d.nm,d.et,d.own,d.mob,d.em,d.on]))};
+
+function shs(){const l=db.loans.find(x=>x.lan==V('ln'));$('out').innerHTML=l?'<h5>Repayment Schedule, '+l.lan+'</h5>'+T(['No.','Due date','Installment','Interest','Principal','Balance'],sched(l)):''}
+function tbl(){const q=V('q').toLowerCase(),f=V('fl');$('tb').innerHTML=T(['Application','Applicant','Facility','Amount','Next stage','Status','Updated',''],db.apps.filter(a=>vis(a)&&(!q||(a.id+a.fn+a.ln+a.mob+a.pan).toLowerCase().includes(q))&&(!f||a.st==f)).map(a=>[a.id,a.fn+' '+a.ln,a.fac,R(a.amt),closed(a)?'-':cur(a)>7?'Completed':STEPS[cur(a)][1],chip(a.st),a.log[0][0],'<button onclick="openA(\''+a.id+'\')">Open</button>']).reverse())}
+
+const ALL=['sales','dsa','store','credit','ops'],TABS=[['new','New Application',['sales','dsa']],['pipe','Pipeline Overview',ALL],['credit','Credit Desk',['credit']],['loans','Loan Master',['sales','credit','ops']],['cat','Catalogue & Schemes',ALL],['dealers','Dealer Mgmt',['sales','store','credit','ops']]];
+const STEPMSG={
+    def:['Processing request...'],
+    kyc:['Contacting UIDAI e-KYC gateway...','Matching Aadhaar demographics...','Fetching CKYC record...'],
+    uw:['Pulling credit bureau report...','Fetching bank statement through Account Aggregator...','Running policy and fraud rules...','Computing scorecard and FOIR...','Evaluating schemes and system flags...'],
+    doc:['Generating documents...','Contacting eSign service...','Stamping and storing documents...'],
+    pay:['Running pre-disbursal checks...','Raising payout request to core banking...','Waiting for IMPS confirmation...','Posting loan account in LMS...'],
+    nav:['Sending secure request to server...','Authenticating session...','Retrieving view payload...'],
+    role:['Terminating previous session...','Acquiring new role token...','Syncing dashboard permissions...']
+};
+
+VW.cat=()=>'<h2>Catalogue and Schemes</h2><p>Phones and two-wheelers on sale in partner stores. Prices are indicative retail prices from October and November 2026 listings.</p><div class="bt"><input class="q" id="cq" placeholder="Search brand or model" oninput="ctb()"><select class="q" id="cb" onchange="ctb()"><option value="">All brands</option>'+[...new Set(PH.map(p=>p.b))].map(x=>'<option>'+x+'</option>').join('')+'</select></div><div id="ct"></div><div id="btb"></div><h5>Consumer Durable Schemes Matrix</h5>'+T(['Scheme','Down payment','Rate','Tenures','Eligibility'],SCH.map(x=>[x.n,x.dp+'%',x.adj==null?'0% (brand funded)':'Base '+(x.adj>=0?'+':'')+x.adj+'%',x.ten.join(', ')+' months',x.why]))+'<p>Base rate by credit tier: A (bureau 750+) 14%, B (700 to 749) 15%, C (685 to 699) 16%.</p>';
+
+function ctb(){
+    const q=V('cq').toLowerCase(),b=V('cb');
+    $('ct').innerHTML='<h5>Phones</h5>'+T(['ID','Brand','Model','Variant','Price','Year','Key specs','Stock'],PH.filter(p=>(!q||(p.b+p.m).toLowerCase().includes(q))&&(!b||p.b==b)).map(p=>[p.id,p.b,p.m,p.v,R(p.p),p.y,p.s,p.q+' units']));
+    $('btb').innerHTML='<h5>Two Wheelers</h5>'+T(['ID','Brand','Model','Variant','Price','Year','Key specs','Stock'],BK.filter(p=>(!q||(p.b+p.m).toLowerCase().includes(q))&&(!b||p.b==b)).map(p=>[p.id,p.b,p.m,p.v,R(p.p),p.y,p.s,p.q+' units']));
+}
+function schChg(){const a=A(),sc=SCH.find(x=>x.id==V('sc'));if(!sc)return;const inv=a.asset.inv;$('dp').value=Math.max(Math.ceil(inv*sc.dp/100),inv-a.uw.elig);$('tn').innerHTML=sc.ten.map(t=>'<option>'+t+'</option>').join('');prev()}
+
+/* NEW: Role switcher function that feels heavy */
+function switchRole(val) {
+    busy(() => {
+        USER = val;
+        init(); // rebuild tabs
+        renderView('pipe', null, 1);
+    }, 'role');
+}
+
+/* NEW: Navigation wrapper to make it feel heavy */
+function goNav(v) { busy(() => renderView(v), 'nav'); }
+
+function renderView(v,m,ok){
+    VIEW=v;
+    $('work').innerHTML=(v=='app'?'':'<div id="msg"></div>')+VW[v]();
+    document.querySelectorAll('.tabs a').forEach(t=>t.classList.toggle('on',t.dataset.v==(v=='app'?'pipe':v)));
+    if(v=='pipe')tbl();
+    if(v=='cat')ctb();
+    if($('sc'))schChg();else prev();
+    if(m)msg(m,ok);
+    $('sysRole').value = USER;
+    $('huName').textContent = USERS[USER].n;
+    $('f1').textContent = USERS[USER].l + ' | ' + USERS[USER].t;
+}
+
+const openA=id=>{AID=id;S=null;goNav('app')};
+
+function init(){
+    $('tabs').innerHTML=TABS.filter(t=>t[2].includes(ROLE())).map(t=>'<a data-v="'+t[0]+'" tabindex="0" onclick="goNav(\''+t[0]+'\')">'+t[1]+'</a>').join('');
+}
+
+function run(steps,done){$('bi').style.width='0';let i=0;(function n(){if(i>=steps.length)return done();$('bm').textContent=steps[i];$('bi').style.width=((i+1)/steps.length*100)+'%';i++;setTimeout(n,250+Math.random()*200)})()}
+
+function reset(){busy(()=>{seed();VIEW='pipe';renderView('pipe','Database wiped and demo data re-seeded.',1)}, 'role')}
+
+if(typeof document!='undefined'&&document.getElementById('boot')){
+    try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+    if(!db||!db.apps)seed();
+    init();
+    run(['Booting TGB Secure Gateway...','Connecting to Core Banking DB...','Loading user profiles...','Ready'],()=>{
+        $('boot').style.display='none';
+        $('app').style.display='flex';
+        renderView('pipe');
+    });
+}
+</script></body></html>
